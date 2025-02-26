@@ -47,6 +47,19 @@ final class CreateTodoServiceTests: XCTestCase {
         XCTAssertEqual(mockRepository.todos.count, 1)
     }
     
+    func test_create_throwsErrorOnInvalidTitle() async throws {
+        // GIVEN
+        let mockRepository = MockTodoRepository()
+        
+        // WHEN
+        XCTAssertThrowsError(try TodoItem(title: "", priority: "medium", dueDate: Date.now.addingTimeInterval(3600))) { error in
+            
+            // THEN
+            XCTAssertEqual(error as? TodoItem.Error, TodoItem.Error.emptyTitle)
+            XCTAssertEqual(mockRepository.todos.count, 0)
+        }
+    }
+    
     // MARK: - Helpers
     private class MockTodoRepository: TodoRepository {
         public var todos: [TodoItem] = []
