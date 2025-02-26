@@ -12,7 +12,11 @@ protocol TodoRepository {
     func save(todo: TodoItem) async throws
 }
 
-class TodoService {
+protocol TodoServiceProtocol {
+    func create(todo: TodoItem) async throws
+}
+
+class TodoService: TodoServiceProtocol {
     private let repository: TodoRepository
     
     init(repository: TodoRepository) {
