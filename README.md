@@ -4,7 +4,6 @@
 
 This case study involves the development of a Todo App with the following core components:
 
-- **API Integration**: Fetching external data via a service.
 - **Local and Remote Storage**: Using Core Data with CloudKit.
 - **Abstraction & Architecture**: Separation of business logic, API, and database layers.
 - **Test-Driven Development (TDD)**: Development based on acceptance and unit tests.
@@ -80,6 +79,6 @@ Steps:
 
 ## Architecture
 Based on the described steps and requirements, I was able to create an architecture diagram that illustrates the interaction between different components of the application.
-![Architecture Diagram](architecture.jpg)
+![Architecture Diagram](architecture.svg)
  
 
