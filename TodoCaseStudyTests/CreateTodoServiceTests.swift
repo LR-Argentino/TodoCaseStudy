@@ -36,7 +36,7 @@ final class CreateTodoServiceTests: XCTestCase {
     
     func test_create_createTodoSuccessfully() async throws {
         // GIVEN
-        let todo = try! TodoItem(title: "Test Todo", priority: "medium", dueDate: Date.now.addingTimeInterval(3600))
+        let todo = try! TodoItem(title: "Test Todo", priority: TodoPriority.low, dueDate: Date.now.addingTimeInterval(3600))
         let mockRepository = MockTodoRepository()
         let sut = TodoService(repository: mockRepository)
         
@@ -52,13 +52,26 @@ final class CreateTodoServiceTests: XCTestCase {
         let mockRepository = MockTodoRepository()
         
         // WHEN
-        XCTAssertThrowsError(try TodoItem(title: "", priority: "medium", dueDate: Date.now.addingTimeInterval(3600))) { error in
+        XCTAssertThrowsError(try TodoItem(title: "", priority: TodoPriority.medium, dueDate: Date.now.addingTimeInterval(3600))) { error in
             
             // THEN
             XCTAssertEqual(error as? TodoItem.Error, TodoItem.Error.emptyTitle)
             XCTAssertEqual(mockRepository.todos.count, 0)
         }
     }
+    
+    func test_create_throwsErrorOnInvalidDueDate() async throws {
+        let mockRepository = MockTodoRepository()
+        
+        // WHEN
+        XCTAssertThrowsError(try TodoItem(title: "Cut the grass", priority: TodoPriority.medium, dueDate: Date.now.addingTimeInterval(-1))) { error in
+            
+            // THEN
+            XCTAssertEqual(error as? TodoItem.Error, TodoItem.Error.invalidDueDate)
+            XCTAssertEqual(mockRepository.todos.count, 0)
+        }
+    }
+        
     
     // MARK: - Helpers
     private class MockTodoRepository: TodoRepository {

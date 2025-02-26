@@ -16,7 +16,7 @@ Feature: Create To-Do
   I want to create, save, and view to-dos
   So that I can manage my tasks efficiently.
 
-  Scenario: Successfully create a to-do
+  Scenario: Successfully create a to-do ✅
     Given I am on the "Create Todo" tab
     When I enter a new to-do with the title "Buy milk"
     And select a due date of "15.03.2025"
@@ -25,7 +25,7 @@ Feature: Create To-Do
     Then I am automatically navigated to the "Todos" tab
     And I see the to-do "Buy milk - Due: 15.03.2025" in the list
 
-  Scenario: Title contains only whitespace
+  Scenario: Title contains only whitespace ✅
     When the user clicks on "New To-Do"
     And the user enters the title "   "
     And the user clicks on "Save"
@@ -35,19 +35,7 @@ Feature: Create To-Do
     And the system displays the error message "Title cannot be empty"
     And the to-do is not saved.
 
-
-  Scenario: Title is missing (Sad Path)
-    When the user clicks on "New To-Do"
-    And the user fills out all fields except the title
-    And the user clicks on "Save"
-    Then the system validates the inputs:
-      | Field | Validation         |
-      | Title | Missing, error shown |
-    And the system displays the error message "Title cannot be empty"
-    And the to-do is not saved.
-
-
-  Scenario: Invalid due date (Sad Path) 
+  Scenario: Invalid due date (Sad Path) ✅
     When the user clicks on "New To-Do"
     And the user sets a due date in the past
     And the user clicks on "Save"
