@@ -39,7 +39,7 @@ public struct TodoItem {
             throw TodoItemError.invalidPriority
         }
         self.priority = priority
-        guard dueDate < Date.now else {
+        guard dueDate > Date() else {
             throw TodoItemError.invalidDueDate
         }
         self.dueDate = dueDate
