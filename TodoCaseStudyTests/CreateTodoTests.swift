@@ -8,13 +8,22 @@
 import XCTest
 import TodoCaseStudy
 
-final class CreateTodoTests: XCTestCase {
-
+class TodoService {
+    public var todos: [TodoItem] = []
     
+    init() {
+    }
+    
+    func create(_ todoItem: TodoItem) {
+        todos.append(todoItem)
+    }
+}
+
+final class CreateTodoTests: XCTestCase {
     
     func test_create_shouldCreateTodoSuccessfully()  {
         // GIVEN
-        let todoItem = try! TodoItem(title: "Test Todo", priority: .high, dueDate: Date())
+        let todoItem = try! TodoItem(title: "Test Todo", priority: TodoPriority.high, dueDate: Date().addingTimeInterval(1000))
         let sut = TodoService()
         
         // WHEN
