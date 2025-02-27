@@ -7,7 +7,7 @@
 
 import XCTest
 
-final class TodoCaseStudyIOSUITests: XCTestCase {
+final class CreateTodoIOSTests: XCTestCase {
 
     override func setUpWithError() throws {
         // Put setup code here. This method is called before the invocation of each test method in the class.
@@ -23,12 +23,35 @@ final class TodoCaseStudyIOSUITests: XCTestCase {
     }
 
     @MainActor
-    func testExample() throws {
-        // UI tests must launch the application that they test.
+    func test_create_shouldCreateTodoSuccessfully() throws {
         let app = XCUIApplication()
         app.launch()
+        
+        // GIVEN
+        let createTodoTab = app.tabBars.buttons["create_todo"]
+        let titleTextField = app.textFields["title"]
+        let dueDatePicker = app.datePickers.element
+        let priorityWheel = app.pickers.element
+        let wheel = priorityWheel.pickerWheels.element
+        
 
-        // Use XCTAssert and related functions to verify your tests produce the correct results.
+        // WHEN
+        createTodoTab.tap()
+        
+        titleTextField.tap()
+        titleTextField.typeText("Seperate Busniess Logic")
+        app.keyboards.buttons["Return"].tap()
+        
+        dueDatePicker.pickerWheels.element(boundBy: 0).adjust(toPickerWheelValue: "April")
+        dueDatePicker.pickerWheels.element(boundBy: 1).adjust(toPickerWheelValue: "15")
+        dueDatePicker.pickerWheels.element(boundBy: 2).adjust(toPickerWheelValue: "2025")
+
+        wheel.adjust(toPickerWheelValue: "High")
+        
+        app.buttons["Save"].tap()
+        
+        // THEN
+        XCTAssertTrue(app.collectionViews.cells.count > 0)
     }
 
     @MainActor
