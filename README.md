@@ -65,7 +65,7 @@ Steps:
 | `isComplete`    | `Bool`   | Indicates if the to-do item is completed    | No           |
 | `assignedUsers` | `[UUID]` | List of users assigned to the to-do item    | Yes          |
 
-## Architecture
+## Current Architecture (in progress)
 Based on the described steps and requirements, I was able to create an architecture diagram that illustrates the interaction between different components of the application.
 ![Architecture Diagram](architecture.svg)
  
