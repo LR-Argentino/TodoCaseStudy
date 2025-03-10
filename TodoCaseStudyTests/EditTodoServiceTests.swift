@@ -9,4 +9,7 @@ import XCTest
 
 final class EditTodoServiceTests: XCTestCase {
     
+    func test_init() {
+      
+    }
 }
