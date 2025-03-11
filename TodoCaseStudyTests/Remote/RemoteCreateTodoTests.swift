@@ -7,7 +7,7 @@
 
 import XCTest
 
-final class EditTodoServiceTests: XCTestCase {
+final class RemoteCreateTodoTests: XCTestCase {
     
     func test_init() {
       

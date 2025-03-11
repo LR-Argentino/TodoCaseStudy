@@ -9,7 +9,7 @@ import XCTest
 import TodoCaseStudy
 
 
-final class CreateTodoServiceTests: XCTestCase {
+final class LocaleCreateTodoTests: XCTestCase {
     
     func test_create_createTodoSuccessfully() async throws {
         // GIVEN
