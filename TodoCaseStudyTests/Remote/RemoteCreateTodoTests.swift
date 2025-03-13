@@ -20,7 +20,7 @@ public class RemoteTodoCreator: CreateTodo {
         return 405
     }
     
-    public enum NetworError: Swift.Error {
+    public enum NetworkError: Swift.Error {
         case invalidMethod
     }
     
@@ -30,31 +30,34 @@ public class RemoteTodoCreator: CreateTodo {
     }
     
     public func create(todo: TodoItem) async throws {
-        let result = try await self.client.create(todo: self.mapper(todo: todo), request: self.request)
-        
-        if result.statusCode == METHOD_NOT_ALLOWED {
-            throw NetworError.invalidMethod
+        do {
+            let result = try await self.client.create(todo: self.mapToData(from: todo), request: self.request)
+            
+            if result.statusCode == METHOD_NOT_ALLOWED {
+                throw NetworkError.invalidMethod
+            }
+        } catch let error as NetworkError {
+            throw error
         }
     }
     
-    private func mapper(todo: TodoItem) -> Data {
+    private func mapToData(from todo: TodoItem) -> Data {
         let remoteTodo = RemoteTodoItem(todo: todo)
         return try! JSONEncoder().encode(remoteTodo)
     }
 }
 
 final class RemoteCreateTodoTests: XCTestCase {
+    
     func test_init_doesNotRequestDataFromURLRequest() async throws {
-        let todo = try! TodoItem(title: "Test", priority: .high, dueDate: Date().addingTimeInterval(100))
         let request = makeRequest()
-        let (sut, client) = makeSUT(with: request)
+        let (_, client) = makeSUT(with: request)
         
-        try await sut.create(todo: todo)
         
         XCTAssertEqual(client.capturedRequests, [])
     }
     
-    func test_init_doesThrowInvalidMethodErrorOnWrongHttpMethod() async throws {
+    func test_create_doesThrowInvalidMethodErrorOnWrongHttpMethod() async throws {
         var request = makeRequest()
         let (sut, _) = makeSUT(with: request, statusCode: 405)
         let todo = makeItem()
@@ -65,10 +68,24 @@ final class RemoteCreateTodoTests: XCTestCase {
             try await sut.create(todo: todo)
             XCTFail("Should throw an error")
         } catch {
-            XCTAssertEqual(error as? RemoteTodoCreator.NetworError, RemoteTodoCreator.NetworError.invalidMethod)
+            XCTAssertEqual(error as? RemoteTodoCreator.NetworkError, RemoteTodoCreator.NetworkError.invalidMethod)
         }
     }
-
+    
+    func test_create_doesRequestRightURL() async throws {
+        let url = URL(string: "www.any-url.com")!
+        let request = makeRequest(from: url)
+        let (sut, client) = makeSUT(with: request, statusCode: 201)
+        let todo = makeItem()
+        
+        do {
+            try await sut.create(todo: todo)
+            XCTAssertEqual(client.capturedRequests[0].url!, url)
+        } catch {
+            XCTFail("Should create todo successfully, but got \(error) instead")
+        }
+        
+    }
     
     
     // MARK: - Helpers
@@ -82,6 +99,8 @@ final class RemoteCreateTodoTests: XCTestCase {
         }
         
         func create(todo: Data, request: URLRequest) async throws -> HTTPURLResponse {
+            capturedRequests.append(request)
+            
             return HTTPURLResponse(url: request.url!, statusCode: statusCode, httpVersion: nil, headerFields: nil)!
         }
     }
