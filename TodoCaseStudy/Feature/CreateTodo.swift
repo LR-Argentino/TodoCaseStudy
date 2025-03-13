@@ -7,6 +7,6 @@
 
 import Foundation
 
-protocol CreateTodo {
+public protocol CreateTodo {
     func create(todo: TodoItem) async throws
 }
