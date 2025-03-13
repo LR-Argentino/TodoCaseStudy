@@ -38,7 +38,7 @@ public class RemoteTodoCreator: CreateTodo {
     }
     
     private func mapper(todo: TodoItem) -> Data {
-        let remoteTodo = RemoteTodoItem(id: todo.id, title: todo.title, priority: todo.priority.rawValue, dueDate: todo.dueDate, createdAt: todo.createdAt, isComplete: todo.isComplete, assignedUsers: todo.assignedUsers)
+        let remoteTodo = RemoteTodoItem(todo: todo)
         return try! JSONEncoder().encode(remoteTodo)
     }
 }

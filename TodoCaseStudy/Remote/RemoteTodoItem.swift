@@ -17,14 +17,13 @@ public struct RemoteTodoItem: Encodable {
     public var isComplete: Bool = false
     public var assignedUsers: [UUID]
     
-    public init(id: UUID, title: String, note: String? = nil, priority: String, dueDate: Date, createdAt: Date, isComplete: Bool, assignedUsers: [UUID]) {
-        self.id = id
-        self.title = title
-        self.note = note
-        self.priority = priority
-        self.dueDate = dueDate
-        self.createdAt = createdAt
-        self.isComplete = isComplete
-        self.assignedUsers = assignedUsers
+    public init(todo: TodoItem) {
+      self.id = todo.id
+      self.title = todo.title
+      self.priority = todo.priority.rawValue
+      self.dueDate = todo.dueDate
+      self.createdAt = todo.createdAt
+      self.isComplete = todo.isComplete
+      self.assignedUsers = todo.assignedUsers
     }
 }
