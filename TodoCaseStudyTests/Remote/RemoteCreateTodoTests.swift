@@ -8,44 +8,6 @@
 import XCTest
 import TodoCaseStudy
 
-public protocol HTTPClient {
-    func create(todo: Data, request: URLRequest) async throws -> HTTPURLResponse
-}
-
-public class RemoteTodoCreator: CreateTodo {
-    private let request: URLRequest
-    private let client: HTTPClient
-    
-    private var METHOD_NOT_ALLOWED: Int {
-        return 405
-    }
-    
-    public enum NetworkError: Swift.Error {
-        case invalidMethod
-    }
-    
-    public init(from request: URLRequest, client: HTTPClient) {
-        self.request = request
-        self.client = client
-    }
-    
-    public func create(todo: TodoItem) async throws {
-        do {
-            let result = try await self.client.create(todo: self.mapToData(from: todo), request: self.request)
-            
-            if result.statusCode == METHOD_NOT_ALLOWED {
-                throw NetworkError.invalidMethod
-            }
-        } catch let error as NetworkError {
-            throw error
-        }
-    }
-    
-    private func mapToData(from todo: TodoItem) -> Data {
-        let remoteTodo = RemoteTodoItem(todo: todo)
-        return try! JSONEncoder().encode(remoteTodo)
-    }
-}
 
 final class RemoteCreateTodoTests: XCTestCase {
     
@@ -68,7 +30,7 @@ final class RemoteCreateTodoTests: XCTestCase {
             try await sut.create(todo: todo)
             XCTFail("Should throw an error")
         } catch {
-            XCTAssertEqual(error as? RemoteTodoCreator.NetworkError, RemoteTodoCreator.NetworkError.invalidMethod)
+            XCTAssertEqual(error as? RemoteTodoCreator.NetworkingError, RemoteTodoCreator.NetworkingError.invalidMethod)
         }
     }
     
@@ -80,13 +42,14 @@ final class RemoteCreateTodoTests: XCTestCase {
         
         do {
             try await sut.create(todo: todo)
-            XCTAssertEqual(client.capturedRequests[0].url!, url)
+            XCTAssertEqual(client.capturedRequests.first?.url, request.url)
         } catch {
             XCTFail("Should create todo successfully, but got \(error) instead")
         }
         
     }
     
+   
     
     // MARK: - Helpers
     
@@ -100,6 +63,7 @@ final class RemoteCreateTodoTests: XCTestCase {
         
         func create(todo: Data, request: URLRequest) async throws -> HTTPURLResponse {
             capturedRequests.append(request)
+            
             
             return HTTPURLResponse(url: request.url!, statusCode: statusCode, httpVersion: nil, headerFields: nil)!
         }
