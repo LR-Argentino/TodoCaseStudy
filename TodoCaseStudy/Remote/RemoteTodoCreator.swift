@@ -10,6 +10,7 @@ import Foundation
 public final class RemoteTodoCreator: CreateTodo {
     private let request: URLRequest
     private let client: HTTPClient
+    private var isRequestInProgress: Bool = false
     
     private var METHOD_NOT_ALLOWED: Int {
         return 405
@@ -27,6 +28,13 @@ public final class RemoteTodoCreator: CreateTodo {
     }
     
     public func create(todo: TodoItem) async throws {
+        guard !isRequestInProgress else {
+            throw NetworkingError.requestAlreadyInProgress
+        }
+        isRequestInProgress = true
+        defer {
+            isRequestInProgress = false
+        }
         let data = try RemoteTodoItemMapper.mapToData(from: todo)
         let result = try await self.client.create(todo: data, request: self.request)
     
