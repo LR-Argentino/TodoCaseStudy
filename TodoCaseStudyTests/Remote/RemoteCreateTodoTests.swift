@@ -49,7 +49,31 @@ final class RemoteCreateTodoTests: XCTestCase {
         
     }
     
-   
+    func test_create_onlySendsOneRequest_whenCalledMultipleTimes() async throws {
+        let request = makeRequest()
+        let (sut, client) = makeSUT(with: request, statusCode: 201)
+        let todo = makeItem()
+        
+        async let call1: () = sut.create(todo: todo)
+        async let call2: () = sut.create(todo: todo)
+        async let call3: () = sut.create(todo: todo)
+        
+        do {
+            // Alle Requests gleichzeitig ausführen
+            _ = try await [call1, call2, call3]
+            XCTFail("A second or third call is expected to fail")
+        } catch {
+            XCTAssertEqual(error as? RemoteTodoCreator.NetworkingError, RemoteTodoCreator.NetworkingError.requestAlreadyInProgress)
+        }
+        
+        // Sicherstellen, dass der HTTP-Client nur einen Request erhalten hat
+        XCTAssertEqual(client.capturedRequests.count, 1, "Es darf nur ein Request abgesendet worden sein.")
+    }
+
+    
+    // TODO: Test Payload / Request Body
+    
+    // TODO: Test for status code in range [200..299]
     
     // MARK: - Helpers
     

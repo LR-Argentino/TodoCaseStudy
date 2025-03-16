@@ -18,6 +18,7 @@ public final class RemoteTodoCreator: CreateTodo {
     public enum NetworkingError: Swift.Error {
         case invalidMethod
         case invalidData
+        case requestAlreadyInProgress
     }
     
     public init(from request: URLRequest, client: HTTPClient) {
@@ -26,23 +27,11 @@ public final class RemoteTodoCreator: CreateTodo {
     }
     
     public func create(todo: TodoItem) async throws {
-        do {
-            let result = try await self.client.create(todo: self.mapToData(from: todo), request: self.request)
-            
-            if result.statusCode == METHOD_NOT_ALLOWED {
-                throw NetworkingError.invalidMethod
-            }
-        }  catch NetworkingError.invalidData {
-            throw NetworkingError.invalidData
-        }
-    }
+        let data = try RemoteTodoItemMapper.mapToData(from: todo)
+        let result = try await self.client.create(todo: data, request: self.request)
     
-    private func mapToData(from todo: TodoItem) throws -> Data {
-        let remoteTodo = RemoteTodoItem(todo: todo)
-        guard let data = try? JSONEncoder().encode(remoteTodo) else {
-            throw NetworkingError.invalidData
+        guard result.statusCode != METHOD_NOT_ALLOWED else {
+            throw NetworkingError.invalidMethod
         }
-        
-        return data
     }
 }
